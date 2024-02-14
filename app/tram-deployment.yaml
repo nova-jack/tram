@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tram-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tram
+  template:
+    metadata:
+      labels:
+        app: tram
+    spec:
+      containers:
+        - name: tram
+          image: ghcr.io/center-for-threat-informed-defense/tram:latest
+          env:
+            - name: DATA_DIRECTORY
+              value: "/tram/data"
+            - name: ALLOWED_HOSTS
+              valueFrom:
+                configMapKeyRef:
+                  name: tram-configmap
+                  key: ALLOWED_HOSTS
+            - name: DJANGO_SUPERUSER_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: tram-secrets
+                  key: DJANGO_SUPERUSER_USERNAME
+            - name: DJANGO_SUPERUSER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: tram-secrets
+                  key: DJANGO_SUPERUSER_PASSWORD
+            - name: DJANGO_SUPERUSER_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: tram-secrets
+                  key: DJANGO_SUPERUSER_EMAIL
+          volumeMounts:
+            - name: tram-data
+              mountPath: /tram/data
+            - name: tram-static
+              mountPath: /tram/src/tram/staticfiles
+      volumes:
+        - name: tram-data
+          persistentVolumeClaim:
+            claimName: tram-data-pvc
+        - name: tram-static
+          persistentVolumeClaim:
+            claimName: tram-static-pvc
