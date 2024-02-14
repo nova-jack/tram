@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: ghcr.io/center-for-threat-informed-defense/tram-nginx:latest
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: tram-data
+              mountPath: /tram/data:ro
+            - name: tram-static
+              mountPath: /tram/src/tram/staticfiles:ro
+          env:
+            - name: NGINX_CONFIG
+              valueFrom:
+                configMapKeyRef:
+                  name: nginx-configmap
+                  key: NGINX_CONFIG
+      volumes:
+        - name: tram-data
+          persistentVolumeClaim:
+            claimName: tram-data-pvc
+        - name: tram-static
+          persistentVolumeClaim:
+            claimName: tram-static-pvc
