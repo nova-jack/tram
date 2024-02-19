@@ -17,7 +17,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN mkdir -p /root/nltk_data/tokenizers && \
     cd /root/nltk_data/tokenizers && \
     wget https://github.com/nltk/nltk_data/raw/gh-pages/packages/tokenizers/punkt.zip -O punkt.zip && \
-    unzip punkt.zip\?raw\=true
+    unzip punkt.zip
 
 EXPOSE 9999
 
